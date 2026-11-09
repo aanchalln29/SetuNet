@@ -12,7 +12,7 @@
 
 ---
 
-## 1. Problem Statement (Slide 2)
+## 1. Problem Statement 
 
 During natural and human-induced disasters (earthquakes, cyclones, flash floods, landslides), commercial telecommunication facilities frequently experience simultaneous systemic collapse:
 - Cellular towers suffer physical damage, destruction, or severed backhaul connections.
@@ -28,7 +28,7 @@ SETU-NET addresses the communications gap between individuals and response units
 
 ---
 
-## 2. Existing Solutions and Research Gap (Slide 3)
+## 2. Existing Solutions and Research Gap 
 
 | Technology | Strengths | Operational Failure Modes During Disasters |
 |---|---|---|
@@ -42,7 +42,7 @@ SETU-NET addresses the communications gap between individuals and response units
 
 ---
 
-## 3. Proposed Architecture (Slide 4)
+## 3. Proposed Architecture 
 
 SETU-NET is designed as an autonomous Android application that allows nearby smartphones to exchange emergency directives without SIM cards, cellular connectivity, or external routers.
 
@@ -77,7 +77,7 @@ python -m unittest discover -s tests
 
 ---
 
-## 5. System Objectives and Target Benchmarks (Slide 5)
+## 5. System Objectives and Target Benchmarks 
 
 | Metric | Target | Evaluation Status |
 |---|---|---|
@@ -90,7 +90,7 @@ python -m unittest discover -s tests
 
 ---
 
-## 6. The 8-Step System Methodology (Slide 6)
+## 6. The 8-Step System Methodology
 
 1. Step 1 (Trigger): An emergency responder or civilian initiates an alert.
 2. Step 2 (Encoding): The application compiles the message with its priority type, GPS location, timestamp, and generates an Ed25519 digital signature over the canonical payload.
@@ -103,7 +103,7 @@ python -m unittest discover -s tests
 
 ---
 
-## 7. Implementation Architecture (Slide 7)
+## 7. Implementation Architecture 
 
 - Client Platform: Android application implemented in Kotlin and Jetpack Compose (`android/app/`).
 - Transport Protocols: Wi-Fi Direct (`WifiP2pManager`), Wi-Fi Aware, and Google Nearby Connections.
@@ -117,7 +117,7 @@ python -m unittest discover -s tests
 
 ---
 
-## 8. Measured Performance Metrics (Slide 8)
+## 8. Measured Performance Metrics 
 
 The prototype measures six core evaluation metrics:
 1. Delivery Ratio (%): Proportion of reachable mesh nodes that received and acknowledged the alert.
@@ -129,7 +129,7 @@ The prototype measures six core evaluation metrics:
 
 ---
 
-## 9. Deliverables and Future Scope (Slide 9 & 10)
+## 9. Deliverables and Future Scope 
 
 - Deliverables:
   - Android application client with emergency UI.
