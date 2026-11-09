@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "description": "PacketGuard detection rules. 'class' marks the four ledger-enabled threats (blockchain) vs the four network-hygiene rules. Thresholds tunable.",
+  "rules": [
+    {
+      "id": "R001",
+      "name": "Packet Loss / Theft",
+      "severity": "HIGH",
+      "class": "blockchain",
+      "enabled": true,
+      "params": {
+        "max_gap": 3,
+        "window_seconds": 10
+      },
+      "detail": "Gap in the sender's sequence numbers beyond the allowed window."
+    },
+    {
+      "id": "R002",
+      "name": "Tampering",
+      "severity": "HIGH",
+      "class": "blockchain",
+      "enabled": true,
+      "params": {},
+      "detail": "Received payload hash differs from the blockchain anchor."
+    },
+    {
+      "id": "R003",
+      "name": "Replay Attack",
+      "severity": "MEDIUM",
+      "class": "blockchain",
+      "enabled": true,
+      "params": {},
+      "detail": "A previously seen payload hash re-appears under a different sequence number."
+    },
+    {
+      "id": "R004",
+      "name": "DoS / Spam Flood",
+      "severity": "HIGH",
+      "class": "hygiene",
+      "enabled": true,
+      "params": {
+        "packets_per_sec": 500
+      },
+      "detail": "A single source IP exceeds the per-second packet-rate threshold."
+    },
+    {
+      "id": "R005",
+      "name": "Spam Activity",
+      "severity": "MEDIUM",
+      "class": "hygiene",
+      "enabled": true,
+      "params": {
+        "identical_payloads": 50,
+        "window_seconds": 5
+      },
+      "detail": "Many identical payloads from one source in a short window."
+    },
+    {
+      "id": "R006",
+      "name": "Data Exfiltration",
+      "severity": "MEDIUM",
+      "class": "hygiene",
+      "enabled": true,
+      "params": {
+        "burst_bytes": 10485760,
+        "window_seconds": 30,
+        "dns_txt_len": 100
+      },
+      "detail": "Large outbound burst to an unknown external IP, or DNS-tunneling pattern."
+    },
+    {
+      "id": "R007",
+      "name": "Route Hijack (TTL anomaly)",
+      "severity": "MEDIUM",
+      "class": "blockchain",
+      "enabled": true,
+      "params": {
+        "ttl_drop_ratio": 0.5
+      },
+      "detail": "Sudden large drop in TTL for an established flow suggests a new hop."
+    },
+    {
+      "id": "R008",
+      "name": "MitM / ARP Spoof",
+      "severity": "HIGH",
+      "class": "hygiene",
+      "enabled": true,
+      "params": {},
+      "detail": "The MAC bound to a known host IP changed from the trusted baseline."
+    }
+  ],
+  "trusted_internal_cidrs": [
+    "10.0.0.0/8",
+    "192.168.0.0/16",
+    "172.16.0.0/12"
+  ]
+}

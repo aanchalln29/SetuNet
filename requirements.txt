@@ -1,0 +1,19 @@
+# SETU-NET Dependencies
+#
+# The core engine, mesh simulation harness, test suite, cryptographic signing,
+# and real-time dashboard all run on the Python 3.9+ standard library alone
+# with zero external installs required.
+#
+# Optional extras below provide hardware acceleration or alternative development tools.
+
+# --- Optional: hardware-accelerated Ed25519 cryptography ----------------------
+# If not installed, SETU-NET automatically uses its built-in pure-Python RFC 8032 Ed25519 engine.
+cryptography>=41.0.0
+
+# --- Optional: alternative web server (if substituting Flask) ------------------
+# The project ships its own dependency-free server in src/dashboard/app.py.
+# flask>=3.0.0
+
+# --- Development & Testing ---------------------------------------------------
+# The test suite uses the stdlib `unittest`; pytest is optional.
+# pytest>=8.0.0

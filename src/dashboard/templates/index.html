@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="beige">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SETU-NET Operations Console — Emergency Mesh Network</title>
+  <meta name="description" content="Application-layer emergency alert dispatch and multi-hop Wi-Fi Direct mesh telemetry system.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Chivo+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- System Chrome -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 3v18M3 12h18"/>
+          <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.2"/>
+        </svg>
+      </span>
+      <div>
+        <div class="topbar__title-row">
+          <h1>SETU-NET OPERATIONS CONSOLE</h1>
+          <span class="version-tag">SPECIFICATION 1.0</span>
+        </div>
+        <p class="topbar__tagline">Autonomous Peer-to-Peer Multi-Hop Alert Protocol over IEEE 802.11 P2P</p>
+      </div>
+    </div>
+
+    <div class="topbar__status">
+      <span class="pill pill--ok" id="meshPill" title="Mesh Topology Status">
+        <span class="pill__dot"></span><span id="meshPillText">MESH: 8 NODES ONLINE</span>
+      </span>
+      <span class="pill pill--rf" id="p2pPill" title="Radio Transport">
+        <span class="pill__dot"></span><span>WI-FI DIRECT / AWARE</span>
+      </span>
+      <span class="pill pill--sec" id="cryptoPill" title="Cryptographic Integrity">
+        <span class="pill__dot"></span><span id="cryptoPillText">ED25519 VERIFIED</span>
+      </span>
+      <button class="btn btn--ghost" id="demoToggle" aria-pressed="true">TRAFFIC GENERATOR: ACTIVE</button>
+      <button class="btn btn--icon" id="themeToggle" title="Toggle Appearance" aria-label="Toggle dark/light appearance">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Priority Dispatch Interface -->
+    <section class="emergency-bar">
+      <div class="emergency-bar__title">
+        <span class="status-indicator"></span>
+        <h2>Emergency Broadcast Dispatch (Priority Classification)</h2>
+      </div>
+      <div class="emergency-bar__actions">
+        <button class="btn btn--sos" id="btnTriggerSos" title="Priority 0 Life-threatening emergency">
+          <span class="btn__badge">P0</span>
+          <span class="btn__text"><strong>CRITICAL (SOS)</strong><small>Life-Threatening Emergency</small></span>
+        </button>
+        <button class="btn btn--evac" id="btnTriggerEvac" title="Priority 1 Instructions to evacuate an area">
+          <span class="btn__badge">P1</span>
+          <span class="btn__text"><strong>WARNING (EVAC)</strong><small>Area Evacuation Order</small></span>
+        </button>
+        <button class="btn btn--troop" id="btnTriggerTroop" title="Priority 2 Controlled unit order">
+          <span class="btn__badge">P2</span>
+          <span class="btn__text"><strong>TACTICAL (TROOP)</strong><small>Unit Movement Order</small></span>
+        </button>
+        <button class="btn btn--gen" id="btnTriggerGen" title="Priority 3 Status updates and all-clear messages">
+          <span class="btn__badge">P3</span>
+          <span class="btn__text"><strong>INFORMATIONAL</strong><small>Status &amp; All-Clear Update</small></span>
+        </button>
+        <button class="btn btn--custom" id="btnCustomAlertModal" title="Manual coordinate and payload entry">
+          <span class="btn__badge">CUSTOM</span>
+          <span class="btn__text"><strong>MANUAL DISPATCH</strong><small>GPS Coordinate Tagging</small></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Key Performance Metrics -->
+    <section class="tiles" aria-label="System Key Performance Indicators">
+      <article class="tile">
+        <p class="tile__label">Total Dispatches</p>
+        <p class="tile__value" id="statBroadcasts">0</p>
+        <p class="tile__sub" id="statBroadcastRate">0.0 alerts/min</p>
+      </article>
+
+      <article class="tile">
+        <div class="tile__head-row">
+          <p class="tile__label">Delivery Ratio</p>
+          <span class="target-badge" id="statDeliveryBadge">TARGET &ge; 90%</span>
+        </div>
+        <p class="tile__value tile__value--ok" id="statDeliveryRatio">100.0%</p>
+        <p class="tile__sub" id="statDeliverySub">Observed via return acknowledgements</p>
+      </article>
+
+      <article class="tile">
+        <div class="tile__head-row">
+          <p class="tile__label">Mean Per-Hop Delay</p>
+          <span class="target-badge" id="statLatencyBadge">TARGET &lt; 5.0s</span>
+        </div>
+        <p class="tile__value" id="statAvgHopLatency">680 ms</p>
+        <p class="tile__sub" id="statLatencySub">Propagation threshold met</p>
+      </article>
+
+      <article class="tile">
+        <p class="tile__label">Duplicates Filtered</p>
+        <p class="tile__value tile__value--accent" id="statDuplicates">0</p>
+        <p class="tile__sub">Suppressed broadcast loops</p>
+      </article>
+
+      <article class="tile">
+        <p class="tile__label">TTL Terminators</p>
+        <p class="tile__value tile__value--warn" id="statTtlDrops">0</p>
+        <p class="tile__sub">Limit reached at hop 6</p>
+      </article>
+
+      <article class="tile">
+        <p class="tile__label">Modeled Energy Drain</p>
+        <p class="tile__value tile__value--subtle" id="statBatteryDrain">0.0 mAh</p>
+        <p class="tile__sub">Wi-Fi Direct RF power model</p>
+      </article>
+    </section>
+
+    <!-- Evaluation Scenarios Toolbar -->
+    <section class="panel panel--scenarios">
+      <div class="panel__head">
+        <div>
+          <h2>Evaluation &amp; Verification Protocol Scenarios</h2>
+          <span class="panel__hint">Controlled evaluation scenarios across the 8-node baseline configuration</span>
+        </div>
+        <button class="btn btn--danger-sm" id="btnTamperAttack" title="Inject an alert with forged Ed25519 signature">
+          INJECT FORGED SIGNATURE TEST
+        </button>
+      </div>
+      <div class="controls" id="scenarioChips">
+        <button class="chip" data-scenario="normal_flood">Controlled Flooding<small>8-Node Mesh</small></button>
+        <button class="chip chip--p0" data-scenario="sos_preemption">SOS Preemption<small>Priority 0 Over Queue</small></button>
+        <button class="chip" data-scenario="duplicate_storm">Duplicate Suppression<small>Loop Elimination</small></button>
+        <button class="chip" data-scenario="ttl_expiration">TTL Limit (6 Hops)<small>Forward Cutoff</small></button>
+        <button class="chip chip--danger" data-scenario="tampered_signature">Signature Verification<small>Tamper Rejection</small></button>
+        <button class="chip" data-scenario="ack_roundtrip">Reverse Delivery Trace<small>ACK Return Trace</small></button>
+        <button class="chip" data-scenario="store_and_carry">Store-and-Carry Buffer<small>Sparse Node Relay</small></button>
+        <button class="chip" data-scenario="clock_skew">Clock Synchronization<small>Time Offset Filter</small></button>
+        <button class="chip chip--scale" data-scenario="scale_50">50-Node Scalability<small>Logical Cluster</small></button>
+      </div>
+    </section>
+
+    <!-- Grid: Real-Time Phone Hopping Topology & Priority Queue -->
+    <div class="grid grid--topology">
+      <!-- Phone-to-Phone Hopping Topology Canvas -->
+      <section class="panel panel--canvas">
+        <div class="panel__head">
+          <div>
+            <h2>Phone-to-Phone Mesh Propagation &amp; Physical Hop Trace</h2>
+            <span class="panel__hint">Direct Wi-Fi Direct Peer Links (150m–200m RF threshold)</span>
+          </div>
+          <div class="topology-legend">
+            <span class="legend-item"><span class="dot dot--sender"></span>Origin Phone 1 (EOC)</span>
+            <span class="legend-item"><span class="dot dot--relay"></span>Relay Phones 2–7</span>
+            <span class="legend-item"><span class="dot dot--control"></span>Phone 8 (Out-of-Range Baseline)</span>
+          </div>
+        </div>
+
+        <div class="canvas-container">
+          <canvas id="meshCanvas" width="760" height="380"></canvas>
+          <div class="canvas-overlay" id="nodeInfoOverlay" hidden>
+            <div class="node-popup" id="nodePopup">
+              <h4 id="popupTitle">Phone 1</h4>
+              <p id="popupRole">Role: Origin Sender</p>
+              <p id="popupBattery">Battery: 100% (0.0 mAh drain)</p>
+              <p id="popupQueue">Queue: 0 alerts | Buffer: 0</p>
+              <p id="popupDistance">Neighbors: 1 in range</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sequential Hop Sequence Bar (Explicit Multi-Hop Stepping) -->
+        <div class="hop-sequence-bar" id="hopSequenceBar">
+          <div class="hop-sequence-bar__title">
+            <span>ACTIVE MULTI-HOP PROPAGATION TRACE:</span>
+            <span id="hopStatusText" class="hop-status-idle">IDLE (READY FOR DISPATCH)</span>
+          </div>
+          <div class="hop-timeline" id="hopTimeline">
+            <div class="hop-node hop-node--origin">
+              <span class="hop-node__num">P1</span>
+              <span class="hop-node__label">ORIGIN</span>
+            </div>
+            <div class="hop-link-step" id="step1">
+              <span class="hop-arrow">&rarr;</span>
+              <span class="hop-metric">HOP 1 (133m)</span>
+            </div>
+            <div class="hop-node" id="hopNode2">
+              <span class="hop-node__num">P2</span>
+              <span class="hop-node__label">ALPHA</span>
+            </div>
+            <div class="hop-link-step" id="step2">
+              <span class="hop-arrow">&rarr;</span>
+              <span class="hop-metric">HOP 2 (125m)</span>
+            </div>
+            <div class="hop-node" id="hopNode4">
+              <span class="hop-node__num">P4</span>
+              <span class="hop-node__label">BETA</span>
+            </div>
+            <div class="hop-link-step" id="step3">
+              <span class="hop-arrow">&rarr;</span>
+              <span class="hop-metric">HOP 3 (125m)</span>
+            </div>
+            <div class="hop-node" id="hopNode6">
+              <span class="hop-node__num">P6</span>
+              <span class="hop-node__label">PATROL</span>
+            </div>
+            <div class="hop-link-step hop-link-step--ack" id="stepAck">
+              <span class="hop-arrow">&larr;</span>
+              <span class="hop-metric">REVERSE ACK RETURN</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel__foot topology-foot">
+          <span>Target Effective RF Range: <strong>150m to 200m</strong> per hop</span>
+          <button class="btn btn--ghost-sm" id="btnTogglePhone8">Toggle Phone 8 Position (Store-and-Carry)</button>
+        </div>
+      </section>
+
+      <!-- Relay Priority Queue Monitor -->
+      <section class="panel panel--queue">
+        <div class="panel__head">
+          <div>
+            <h2>Relay Priority Queue</h2>
+            <span class="panel__hint">P0 SOS preempts lower-priority messages</span>
+          </div>
+          <span class="count-badge" id="queueBadge">0 in queue</span>
+        </div>
+        <div class="queue-list" id="queueList">
+          <div class="empty">Queue is clear. Transmission latency is within operational limits.</div>
+        </div>
+        <div class="panel__foot">
+          <span class="panel__hint" id="preemptionCounter">SOS Preemptions Recorded: 0</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- Grid: Live Emergency Feed & Reverse Acknowledgements -->
+    <div class="grid grid--feed-acks">
+      <!-- Live Alert Stream -->
+      <section class="panel panel--feed">
+        <div class="panel__head">
+          <div>
+            <h2>Live Emergency Broadcast Stream</h2>
+            <span class="panel__hint">Cryptographically Verified &amp; Geographically Tagged</span>
+          </div>
+          <div class="feed-filter-legend">
+            <span class="tag-cat tag-cat--sos">P0 CRITICAL</span>
+            <span class="tag-cat tag-cat--evac">P1 WARNING</span>
+            <span class="tag-cat tag-cat--troop">P2 TACTICAL</span>
+            <span class="tag-cat tag-cat--gen">P3 INFO</span>
+          </div>
+        </div>
+        <div class="feed" id="alertFeed" role="log" aria-live="polite">
+          <div class="empty">Awaiting emergency broadcasts...</div>
+        </div>
+      </section>
+
+      <!-- Reverse Acknowledgement (ACK) Delivery Trace -->
+      <section class="panel panel--acks">
+        <div class="panel__head">
+          <div>
+            <h2>Observed Delivery Receipts (Reverse ACK Trace)</h2>
+            <span class="panel__hint">Observed delivery reports returned to origin phone</span>
+          </div>
+          <span class="count-badge count-badge--ok" id="ackCountBadge">0 ACKs</span>
+        </div>
+        <div class="acks-list" id="acksList">
+          <div class="empty">Delivery confirmations will appear as relay nodes acknowledge reception.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Cryptographic Proof & Verification Audit Panel -->
+    <section class="panel panel--audit">
+      <div class="panel__head">
+        <div>
+          <h2>Cryptographic Audit &amp; Integrity Verification</h2>
+          <span class="panel__hint">Ed25519 digital signature, canonical bytes, and reverse hop trace export</span>
+        </div>
+        <div class="audit-actions">
+          <input type="text" id="auditInputId" placeholder="Enter Alert ID (e.g. SETU-SOS-000001)" class="input-text">
+          <button class="btn btn--primary" id="btnVerifyAudit">Verify Signature &amp; Path</button>
+          <a class="btn btn--ghost" id="btnDownloadAudit" href="#" hidden>Export JSON Bundle</a>
+        </div>
+      </div>
+      <div class="audit-output" id="auditOutput">
+        <p class="empty">Select an alert or click &ldquo;Audit Proof&rdquo; on any broadcast card to inspect cryptographic signature verification and hop path records.</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="foot">
+      <div class="foot__col">
+        <strong>SETU-NET</strong> — Multi-Hop Emergency Alert Protocol over Autonomous Smartphone Wi-Fi
+      </div>
+      <div class="foot__col foot__note">
+        Decentralized backup disaster communications protocol. Android implementation (Kotlin / Jetpack Compose).
+      </div>
+    </footer>
+  </main>
+
+  <!-- Manual Dispatch Modal -->
+  <dialog id="customAlertDialog" class="modal">
+    <div class="modal__box">
+      <div class="modal__head">
+        <h3>Dispatch Emergency Message</h3>
+        <button class="btn-close" id="btnCloseModal" aria-label="Close dialog">&times;</button>
+      </div>
+      <form id="customAlertForm" method="dialog">
+        <div class="form-group">
+          <label for="formCategory">Priority Classification</label>
+          <select id="formCategory" class="form-select" required>
+            <option value="SOS">CRITICAL (SOS) — Life-Threatening Emergency [P0]</option>
+            <option value="EVACUATION">WARNING (EVAC) — Area Evacuation Directive [P1]</option>
+            <option value="TROOP_MOVEMENT">TACTICAL (TROOP) — Unit Movement Order [P2]</option>
+            <option value="GENERAL">INFORMATIONAL — Status &amp; All-Clear Advisory [P3]</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="formSender">Originating Node</label>
+          <select id="formSender" class="form-select">
+            <option value="phone-1">Phone 1 (EOC Incident Commander)</option>
+            <option value="phone-2">Phone 2 (Relay - Rescue Unit Alpha)</option>
+            <option value="phone-3">Phone 3 (Relay - Civilian Shelter North)</option>
+            <option value="phone-5">Phone 5 (Relay - Medical Field Clinic)</option>
+            <option value="phone-6">Phone 6 (Relay - Security Troop Patrol)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="formLat">GPS Latitude</label>
+            <input type="number" step="0.0001" id="formLat" value="28.6139" class="input-text">
+          </div>
+          <div class="form-group">
+            <label for="formLon">GPS Longitude</label>
+            <input type="number" step="0.0001" id="formLon" value="77.2090" class="input-text">
+          </div>
+          <div class="form-group">
+            <label for="formTtl">Initial TTL (Hop Limit)</label>
+            <input type="number" min="1" max="10" id="formTtl" value="6" class="input-text">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="formPayload">Emergency Directive / Payload</label>
+          <textarea id="formPayload" rows="3" class="form-textarea" placeholder="Enter structured operational directive..." required>Structural collapse on Bridge Sector 4. Medical triage dispatched. Relocate all units to High Embankment.</textarea>
+        </div>
+
+        <div class="modal__foot">
+          <button type="button" class="btn btn--ghost" id="btnCancelModal">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="btnSubmitAlert">Sign &amp; Dispatch</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- System Notification Bar -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

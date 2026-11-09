@@ -1,0 +1,52 @@
+# PacketGuard isolated lab network (template).
+#
+# Defines a three-node topology — sender, receiver, and a monitored attacker box —
+# on a private bridge with NO route to the host network or the internet. This is
+# the ONLY kind of environment in which the real attack tools named in
+# PROJECT_PLAN.md should ever be run.
+#
+#   docker compose -f simulations/docker-compose.yml up
+#
+# The containers are intentionally minimal; add your own lab tooling inside them.
+# Nothing here attacks anything by itself — it only provides sandboxed hosts.
+
+version: "3.9"
+
+networks:
+  packetguard_lab:
+    driver: bridge
+    internal: true          # no gateway to the host / internet — fully sandboxed
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+
+services:
+  sender:
+    image: python:3.11-slim
+    container_name: pg_sender
+    networks:
+      packetguard_lab:
+        ipv4_address: 10.0.0.1
+    command: ["sleep", "infinity"]
+
+  receiver:
+    image: python:3.11-slim
+    container_name: pg_receiver
+    networks:
+      packetguard_lab:
+        ipv4_address: 10.0.0.2
+    command: ["sleep", "infinity"]
+
+  # Monitored node. Any lab attack tooling runs HERE, against the two nodes above
+  # only, inside this sandboxed network. Requires elevated capabilities, so these
+  # are commented out by default — enable them deliberately for your lab.
+  attacker:
+    image: python:3.11-slim
+    container_name: pg_attacker
+    networks:
+      packetguard_lab:
+        ipv4_address: 10.0.0.47
+    # cap_add:
+    #   - NET_ADMIN
+    #   - NET_RAW
+    command: ["sleep", "infinity"]
